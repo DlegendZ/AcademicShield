@@ -103,29 +103,23 @@ function arcPath(cx, cy, r, startDeg, endDeg) {
 }
 
 function burnoutGauge(score, className, classId) {
-  // Top-half speedometer: 0=left (9 o'clock), 50=top (12 o'clock), 100=right (3 o'clock)
-  // ang maps score to compass degrees: 270=left, 360=top, 450=right
-  const cx = 150, cy = 155, r = 110;
+  // Semicircle: value 0..100 maps to angle 180deg (left) .. 360deg (right)
+  const cx = 150, cy = 150, r = 110;
+  const ang = (v) => 180 + (v / 100) * 180;
   const col = [COLORS.healthy, COLORS.mild, COLORS.burnout][classId] || COLORS.text;
-  const ang = (v) => 270 + (v / 100) * 180;
-  // pt() returns "x,y" string for a given score value
-  const pt = (v) => { const [x, y] = polar(cx, cy, r, ang(v)); return `${x.toFixed(1)},${y.toFixed(1)}`; };
-  // sweep=1 (clockwise in SVG screen) draws left→top→right = the top half
-  const arc = (v1, v2, c, w) =>
-    `<path d="M ${pt(v1)} A ${r} ${r} 0 0 1 ${pt(v2)}" stroke="${c}" stroke-width="${w}" fill="none" stroke-linecap="butt"/>`;
-  const needle = score > 0.5
-    ? `<path d="M ${pt(0)} A ${r} ${r} 0 0 1 ${pt(score)}" stroke="${COLORS.text}" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.85"/>`
-    : '';
+  const seg = (a, b, c) =>
+    `<path d="${arcPath(cx, cy, r, ang(a), ang(b))}" stroke="${c}" stroke-width="22" fill="none" stroke-linecap="butt"/>`;
+  const valArc = `<path d="${arcPath(cx, cy, r, ang(0), ang(score))}" stroke="${COLORS.text}" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.85"/>`;
   const [nx, ny] = polar(cx, cy, r, ang(score));
   return `
   <svg viewBox="0 0 300 200" width="100%" style="max-width:340px">
-    ${arc(0,  35, "rgba(74,167,133,0.30)",  22)}
-    ${arc(35, 65, "rgba(212,168,67,0.30)",  22)}
-    ${arc(65, 100,"rgba(199,80,80,0.30)",   22)}
-    ${needle}
-    <circle cx="${nx.toFixed(1)}" cy="${ny.toFixed(1)}" r="7" fill="${col}"/>
-    <text x="${cx}" y="130" text-anchor="middle" font-size="46" font-weight="600" fill="${COLORS.text}" font-family="Newsreader,serif">${Math.round(score)}</text>
-    <text x="${cx}" y="170" text-anchor="middle" font-size="18" font-weight="600" fill="${col}" font-family="Newsreader,serif">${className}</text>
+    ${seg(0, 40, "rgba(74,167,133,0.30)")}
+    ${seg(40, 70, "rgba(212,168,67,0.30)")}
+    ${seg(70, 100, "rgba(199,80,80,0.30)")}
+    ${valArc}
+    <circle cx="${nx}" cy="${ny}" r="7" fill="${col}"/>
+    <text x="${cx}" y="135" text-anchor="middle" font-size="46" font-weight="600" fill="${COLORS.text}" font-family="Newsreader,serif">${Math.round(score)}</text>
+    <text x="${cx}" y="172" text-anchor="middle" font-size="18" font-weight="600" fill="${col}" font-family="Newsreader,serif">${className}</text>
   </svg>`;
 }
 
@@ -154,22 +148,15 @@ function gpaRing(gpa, label) {
 }
 
 function radarChart(inp) {
-  const stressMap = { Low: 8.0, Moderate: 5.0, High: 2.0 };  // inverted: low stress = good
+  const stressMap = { Low: 2.0, Moderate: 5.0, High: 8.0 };
   const cats = ["Study", "Sleep", "Exercise", "Social", "ECA", "Stress",
     "Exam", "Family", "Finance", "Support", "Anxiety", "Depression"];
   const vals = [
-    Math.min(inp.study_hours * 10 / 6,   10),  // 6h = full score
-    Math.min(inp.sleep_hours * 10 / 8,   10),  // 8h = full score
-    Math.min(inp.physical_hours * 10 / 1.5, 10), // 1.5h = full score
-    Math.min(inp.social_hours * 10 / 3,  10),  // 3h = full score
-    Math.min(inp.eca_hours * 10 / 2,     10),  // 2h = full score
-    stressMap[inp.stress_level_category],        // inverted
-    10 - inp.exam_pressure,                      // inverted: low pressure = good
-    10 - inp.family_expectation,                 // inverted: low expectation = good
-    10 - inp.financial_stress,                   // inverted: low stress = good
-    inp.social_support,                          // higher support = good (unchanged)
-    10 - inp.anxiety_score,                      // inverted: low anxiety = good
-    10 - inp.depression_score,                   // inverted: low depression = good
+    Math.min(inp.study_hours * 10 / 12, 10), Math.min(inp.sleep_hours * 10 / 12, 10),
+    Math.min(inp.physical_hours * 10 / 13, 10), Math.min(inp.social_hours * 10 / 6, 10),
+    Math.min(inp.eca_hours * 10 / 4, 10), stressMap[inp.stress_level_category],
+    inp.exam_pressure, inp.family_expectation, inp.financial_stress,
+    inp.social_support, inp.anxiety_score, inp.depression_score,
   ];
   const cx = 170, cy = 170, R = 120, n = cats.length;
   const grid = [2, 4, 6, 8, 10].map(g => {
@@ -289,23 +276,18 @@ function buildRatingSelectors() {
     ["depression_score_rating", "Depression level"],
   ];
   const host = document.getElementById("ratings");
-  host.innerHTML = fields.map(([key, label]) => {
-    const idx = RATING_OPTIONS.indexOf(state[key]);
-    return `
+  host.innerHTML = fields.map(([key, label]) => `
     <div class="field">
       <label>${label}</label>
-      <div class="slider-row">
-        <input type="range" class="rating-slider" data-key="${key}" min="0" max="4" step="1" value="${idx}" />
-        <output class="rating-val">${state[key]}</output>
+      <div class="seg" data-key="${key}">
+        ${RATING_OPTIONS.map(o => `<button type="button" class="seg-btn${state[key] === o ? " on" : ""}" data-val="${o}">${o}</button>`).join("")}
       </div>
-    </div>`;
-  }).join("");
-
-  host.querySelectorAll(".rating-slider").forEach(slider => {
-    slider.addEventListener("input", () => {
-      const val = RATING_OPTIONS[parseInt(slider.value)];
-      state[slider.dataset.key] = val;
-      slider.closest(".field").querySelector(".rating-val").textContent = val;
+    </div>`).join("");
+  host.querySelectorAll(".seg").forEach(seg => {
+    seg.addEventListener("click", e => {
+      const btn = e.target.closest(".seg-btn"); if (!btn) return;
+      state[seg.dataset.key] = btn.dataset.val;
+      seg.querySelectorAll(".seg-btn").forEach(b => b.classList.toggle("on", b === btn));
     });
   });
 }
@@ -356,14 +338,6 @@ function init() {
     });
   });
   document.getElementById("fb-submit").addEventListener("click", submitFeedback);
-
-  const drawer = document.getElementById("drawer");
-  const overlay = document.getElementById("overlay");
-  const openDrawer = () => { drawer.classList.add("open"); overlay.classList.add("open"); };
-  const closeDrawer = () => { drawer.classList.remove("open"); overlay.classList.remove("open"); };
-  document.getElementById("menu-btn").addEventListener("click", openDrawer);
-  document.getElementById("drawer-close").addEventListener("click", closeDrawer);
-  overlay.addEventListener("click", closeDrawer);
 }
 
 document.addEventListener("DOMContentLoaded", init);
