@@ -1,0 +1,6 @@
+# Build-time only — needed to RETRAIN + TRANSPILE the models to JS.
+# NOT needed to serve the static site (web/ has no Python runtime) and NOT
+# needed by the Streamlit app. Install on top of the root requirements.txt:
+#   pip install -r requirements.txt -r scripts/requirements-build.txt
+m2cgen==0.10.0
+imbalanced-learn==0.14.1

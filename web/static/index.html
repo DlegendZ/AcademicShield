@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic Shield</title>
+  <meta name="description" content="Measure your burnout and predict your GPA — fully in your browser." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600;6..72,700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main class="wrap">
+
+    <!-- STEP 1 -->
+    <section id="step1" class="screen active">
+      <header class="hero">
+        <h1>Measure Your Burnout &amp; Predict Your Grade</h1>
+        <p>Chronic <b>burnout</b> reduces focus, memory, and motivation — directly lowering your GPA.<br />
+           Track your daily habits to see where you stand.</p>
+      </header>
+      <div class="progress"><span class="dot on"></span><span class="bar"></span><span class="dot"></span>
+        <em>Step 1 of 2 — Lifestyle &amp; Habits</em></div>
+
+      <div class="card">
+        <div class="field">
+          <label>How many hours do you study per day?</label>
+          <div class="slider-row"><input type="range" id="study_hours" min="0" max="12" step="0.5" /><output id="study_hours_val"></output></div>
+        </div>
+        <div class="field">
+          <label>How many hours do you sleep per day?</label>
+          <div class="slider-row"><input type="range" id="sleep_hours" min="0" max="12" step="0.5" /><output id="sleep_hours_val"></output></div>
+        </div>
+        <div class="field">
+          <label>Extracurricular activities (hours/day)?</label>
+          <div class="slider-row"><input type="range" id="eca_hours" min="0" max="6" step="0.5" /><output id="eca_hours_val"></output></div>
+        </div>
+        <div class="field">
+          <label>How many hours do you socialize per day?</label>
+          <div class="slider-row"><input type="range" id="social_hours" min="0" max="9" step="0.5" /><output id="social_hours_val"></output></div>
+        </div>
+        <div class="field">
+          <label>How many hours do you exercise per day?</label>
+          <div class="slider-row"><input type="range" id="physical_hours" min="0" max="6" step="0.5" /><output id="physical_hours_val"></output></div>
+        </div>
+        <p id="remaining" class="hint"></p>
+        <p id="over24" class="warn" style="display:none">Your total exceeds 24 hours. Please adjust your inputs.</p>
+        <button id="toStep2" class="btn primary">Next →</button>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="step2" class="screen">
+      <header class="hero"><h1>Measure Your Burnout &amp; Predict Your Grade</h1></header>
+      <div class="progress"><span class="dot on"></span><span class="bar on"></span><span class="dot on"></span>
+        <em>Step 2 of 2 — Mental Health &amp; Stress</em></div>
+      <p class="privacy">🔒 Your answers stay in your browser. Nothing is uploaded for the prediction.</p>
+
+      <div class="card">
+        <div class="field">
+          <label>How is your stress condition recently?</label>
+          <select id="stress_select">
+            <option>Low</option><option>Moderate</option><option>High</option>
+          </select>
+        </div>
+        <hr />
+        <div id="ratings"></div>
+        <button id="analyze" class="btn primary">Analyze! →</button>
+        <button id="backTo1" class="btn ghost">← Back</button>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section id="results" class="screen">
+      <header class="hero"><h1>Your Results</h1></header>
+      <p id="latency" class="latency"></p>
+
+      <div class="card center"><p class="section-label">Burnout Level</p><div id="gauge"></div></div>
+      <div class="card center"><div id="gpa"></div></div>
+      <div class="card center"><p class="section-label">Your Profile</p><div id="radar"></div></div>
+      <div class="card"><p class="section-label">Classification Breakdown</p><div id="probbars"></div></div>
+      <div id="insight" class="insight"></div>
+
+      <div class="card">
+        <p class="section-label">Feedback</p>
+        <p class="hint center">Help us improve Academic Shield!</p>
+        <div id="fb-stars" class="stars">
+          <button type="button">★</button><button type="button">★</button><button type="button">★</button>
+          <button type="button">★</button><button type="button">★</button>
+        </div>
+        <textarea id="fb-comment" placeholder="Any comments?"></textarea>
+        <button id="fb-submit" class="btn primary">Submit Feedback</button>
+        <p id="fb-status" class="hint center"></p>
+      </div>
+
+      <button id="restart" class="btn ghost">← Start Over</button>
+    </section>
+
+  </main>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>
