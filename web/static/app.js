@@ -1,11 +1,9 @@
-// Academic Shield — fully client-side inference + UI.
+// Academic Shield - fully client-side inference + UI.
 // All prediction happens in the browser; zero network on the hot path.
 import { scoreModelA } from "./models/model_a.js";
 import { scoreModelB } from "./models/model_b.js";
 
-// ---------------------------------------------------------------------------
-// Config — mirrors src/config.py exactly
-// ---------------------------------------------------------------------------
+// Config - mirrors src/config.py exactly
 const STRESS_MAPPING_A = { Low: 2.29, Moderate: 4.80, High: 7.42 };
 const STRESS_MAPPING_B = { Low: 0, Moderate: 1, High: 2 };
 const BURNOUT_CLASSES = { 0: "Healthy", 1: "Mildly Burnout", 2: "Burnout" };
@@ -35,9 +33,7 @@ const B_RANGES = {
   physical_hours: [0.0, 13.0, 4.33],
 };
 
-// ---------------------------------------------------------------------------
-// Inference — ports of src/models.py predict_burnout / predict_gpa
-// ---------------------------------------------------------------------------
+// Inference - ports of src/models.py predict_burnout / predict_gpa
 function predictBurnout(inp) {
   const stress = STRESS_MAPPING_A[inp.stress_level_category];
   const f = {
@@ -88,9 +84,7 @@ function predictGpa(inp) {
   return { gpa, label };
 }
 
-// ---------------------------------------------------------------------------
 // SVG chart helpers
-// ---------------------------------------------------------------------------
 function polar(cx, cy, r, deg) {
   const a = (deg - 90) * Math.PI / 180;
   return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
@@ -205,9 +199,7 @@ function probabilityBars(proba) {
     </div>`).join("");
 }
 
-// ---------------------------------------------------------------------------
 // App state + navigation
-// ---------------------------------------------------------------------------
 const state = {
   study_hours: 4.0, sleep_hours: 8.0, eca_hours: 1.0, social_hours: 3.0, physical_hours: 2.0,
   stress_level_category: "Moderate",
@@ -255,9 +247,7 @@ function runResults() {
   show("results");
 }
 
-// ---------------------------------------------------------------------------
 // Wire up DOM
-// ---------------------------------------------------------------------------
 function bindSlider(id, key) {
   const el = document.getElementById(id);
   const out = document.getElementById(id + "_val");

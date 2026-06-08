@@ -1,14 +1,10 @@
 """Central configuration for Academic Shield app."""
 
-# ---------------------------------------------------------------------------
 # Stress-level mappings (different encoding per model)
-# ---------------------------------------------------------------------------
 STRESS_MAPPING_A = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
 STRESS_MAPPING_B = {"Low": 0, "Moderate": 1, "High": 2}
 
-# ---------------------------------------------------------------------------
-# Model A — Burnout classification
-# ---------------------------------------------------------------------------
+# Model A - Burnout classification
 MODEL_A_BASE_FEATURES = [
     "study_hours_per_day",
     "sleep_hours",
@@ -31,9 +27,7 @@ BURNOUT_CLASSES = {0: "Healthy", 1: "Mildly Burnout", 2: "Burnout"}
 # Formula = proba[0] * 20 + proba[1] * 55 + proba[2] * 85
 BURNOUT_SCORE_WEIGHTS = [20, 55, 85]
 
-# ---------------------------------------------------------------------------
-# Model B — GPA regression
-# ---------------------------------------------------------------------------
+# Model B - GPA regression
 MODEL_B_BASE_FEATURES = [
     "study_hours",
     "eca_hours",
@@ -50,9 +44,7 @@ GPA_LABELS = [
     (0.0, "Needs improvement."),
 ]
 
-# ---------------------------------------------------------------------------
-# UI — Claude-style warm palette
-# ---------------------------------------------------------------------------
+# UI - Claude-style warm palette
 COLORS = {
     "bg": "#FAF6F1",
     "bg_warm": "#F5EDE4",
@@ -72,20 +64,6 @@ COLORS = {
     "burnout": "#C75050",
     "white": "#FFFFFF",
 }
-
-# Page 1 session-state keys
-PAGE1_KEYS = ["study_hours", "sleep_hours", "eca_hours", "social_hours", "physical_hours"]
-
-# All session-state keys required before prediction
-ALL_INPUT_KEYS = PAGE1_KEYS + [
-    "stress_level_category",
-    "exam_pressure",
-    "family_expectation",
-    "financial_stress",
-    "social_support",
-    "anxiety_score",
-    "depression_score",
-]
 
 # Insight messages keyed by burnout class
 INSIGHTS = {

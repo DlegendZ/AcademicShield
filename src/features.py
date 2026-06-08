@@ -25,7 +25,7 @@ def engineer_features_a(df):
     return df
 
 # Feature engineering for Model B experimentation (modelB_v2.ipynb)
-# NOT used for the deployment — modelB.pkl was trained without feature engineering
+# NOT used for the deployment - modelB.pkl was trained without feature engineering
 # Kept here for reference and future experimentation only
 def engineer_features_b(df):
     df = df.copy()
