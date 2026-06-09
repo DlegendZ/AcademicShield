@@ -48,7 +48,7 @@ in code form, verified identical to the Python model within 1e-4 by
 ## Repository layout
 
 ```
-src/                         shared config, features, models, UI
+src/                         shared config + feature engineering (config.py, features.py)
 models/
   modelA.pkl, modelB.pkl     deployed compact models (from notebooks/)
 notebooks/
@@ -64,6 +64,8 @@ web/                         static + FastAPI client-side app
   vercel.json                CDN-serves static, routes /api/* to FastAPI
   requirements.txt           fastapi
 datasets/                    raw CSVs (gitignored, not committed)
+MLflow.ipynb                 experiment tracking (MLflow runs)
+artifacts.zip                exported MLflow artifacts
 ```
 
 ---

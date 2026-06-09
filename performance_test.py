@@ -45,52 +45,71 @@ except ImportError:
 
 # ── thresholds (ms) ───────────────────────────────────────────────────────────
 TARGETS = {
-    "ttfb_mean":        500,    # Time To First Byte mean
-    "total_mean":      2000,    # Total response time mean
-    "total_p95":       3000,    # 95th percentile response
-    "error_rate_pct":     5,    # Max acceptable error %
-    "inference_mean":   100,    # Local model inference (A+B combined)
-    "concurrent_mean": 3000,    # Mean under concurrent load
+    "ttfb_mean": 500,  # Time To First Byte mean
+    "total_mean": 2000,  # Total response time mean
+    "total_p95": 3000,  # 95th percentile response
+    "error_rate_pct": 5,  # Max acceptable error %
+    "inference_mean": 100,  # Local model inference (A+B combined)
+    "concurrent_mean": 3000,  # Mean under concurrent load
 }
 
 # ── color output ──────────────────────────────────────────────────────────────
-GREEN  = "\033[92m"
+GREEN = "\033[92m"
 YELLOW = "\033[93m"
-RED    = "\033[91m"
-CYAN   = "\033[96m"
-BOLD   = "\033[1m"
-RESET  = "\033[0m"
+RED = "\033[91m"
+CYAN = "\033[96m"
+BOLD = "\033[1m"
+RESET = "\033[0m"
 
-def ok(msg):    return f"{GREEN}✅ PASS{RESET}  {msg}"
-def warn(msg):  return f"{YELLOW}⚠️  WARN{RESET}  {msg}"
-def fail(msg):  return f"{RED}❌ FAIL{RESET}  {msg}"
-def info(msg):  return f"{CYAN}ℹ{RESET}  {msg}"
+
+def ok(msg):
+    return f"{GREEN}✅ PASS{RESET}  {msg}"
+
+
+def warn(msg):
+    return f"{YELLOW}⚠️  WARN{RESET}  {msg}"
+
+
+def fail(msg):
+    return f"{RED}❌ FAIL{RESET}  {msg}"
+
+
+def info(msg):
+    return f"{CYAN}ℹ{RESET}  {msg}"
+
 
 def verdict(value, target, label, unit="ms", lower_is_better=True):
-    ok_thresh  = target
+    ok_thresh = target
     warn_thresh = target * 2
     if lower_is_better:
-        if value <= ok_thresh:   return ok(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
-        elif value <= warn_thresh: return warn(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
-        else:                    return fail(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
+        if value <= ok_thresh:
+            return ok(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
+        elif value <= warn_thresh:
+            return warn(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
+        else:
+            return fail(f"{label}: {value:.1f}{unit}  (target ≤ {target}{unit})")
     else:
-        if value >= ok_thresh:   return ok(f"{label}: {value:.1f}{unit}  (target ≥ {target}{unit})")
-        else:                    return fail(f"{label}: {value:.1f}{unit}  (target ≥ {target}{unit})")
+        if value >= ok_thresh:
+            return ok(f"{label}: {value:.1f}{unit}  (target ≥ {target}{unit})")
+        else:
+            return fail(f"{label}: {value:.1f}{unit}  (target ≥ {target}{unit})")
 
 
 # ── data container ────────────────────────────────────────────────────────────
 @dataclass
 class RequestResult:
-    success:      bool
-    ttfb_ms:      float = 0.0
-    total_ms:     float = 0.0
-    status_code:  int   = 0
-    content_bytes:int   = 0
-    error:        str   = ""
+    success: bool
+    ttfb_ms: float = 0.0
+    total_ms: float = 0.0
+    status_code: int = 0
+    content_bytes: int = 0
+    error: str = ""
 
 
 # ── single request ────────────────────────────────────────────────────────────
-def make_request(url: str, session: requests.Session, timeout: int = 15) -> RequestResult:
+def make_request(
+    url: str, session: requests.Session, timeout: int = 15
+) -> RequestResult:
     try:
         t_start = time.perf_counter()
         with session.get(url, timeout=timeout, stream=True) as resp:
@@ -112,7 +131,7 @@ def make_request(url: str, session: requests.Session, timeout: int = 15) -> Requ
 def make_session() -> requests.Session:
     s = requests.Session()
     retry = Retry(total=1, backoff_factor=0.3, status_forcelist=[500, 502, 503, 504])
-    s.mount("http://",  HTTPAdapter(max_retries=retry))
+    s.mount("http://", HTTPAdapter(max_retries=retry))
     s.mount("https://", HTTPAdapter(max_retries=retry))
     s.headers.update({"User-Agent": "AcademicShield-PerfTest/1.0"})
     return s
@@ -123,18 +142,18 @@ def compute_stats(values: list[float]) -> dict:
     if not values:
         return {}
     sv = sorted(values)
-    n  = len(sv)
+    n = len(sv)
     return {
-        "n":      n,
-        "mean":   statistics.mean(sv),
+        "n": n,
+        "mean": statistics.mean(sv),
         "median": statistics.median(sv),
-        "std":    statistics.stdev(sv) if n > 1 else 0.0,
-        "min":    sv[0],
-        "max":    sv[-1],
-        "p75":    sv[int(0.75 * n)],
-        "p90":    sv[int(0.90 * n)],
-        "p95":    sv[min(int(0.95 * n), n - 1)],
-        "p99":    sv[min(int(0.99 * n), n - 1)],
+        "std": statistics.stdev(sv) if n > 1 else 0.0,
+        "min": sv[0],
+        "max": sv[-1],
+        "p75": sv[int(0.75 * n)],
+        "p90": sv[int(0.90 * n)],
+        "p95": sv[min(int(0.95 * n), n - 1)],
+        "p99": sv[min(int(0.99 * n), n - 1)],
     }
 
 
@@ -157,21 +176,21 @@ def print_stats(label: str, s: dict, unit: str = "ms") -> None:
 
 # ── section 1: DNS + connectivity ────────────────────────────────────────────
 def test_connectivity(url: str) -> dict:
-    parsed  = urllib.parse.urlparse(url)
-    host    = parsed.hostname
-    port    = parsed.port or (443 if parsed.scheme == "https" else 80)
+    parsed = urllib.parse.urlparse(url)
+    host = parsed.hostname
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
     results = {}
 
     # DNS
     t0 = time.perf_counter()
     try:
         ip = socket.gethostbyname(host)
-        results["dns_ms"]  = (time.perf_counter() - t0) * 1000
-        results["dns_ip"]  = ip
-        results["dns_ok"]  = True
+        results["dns_ms"] = (time.perf_counter() - t0) * 1000
+        results["dns_ip"] = ip
+        results["dns_ok"] = True
     except Exception as e:
-        results["dns_ms"]  = (time.perf_counter() - t0) * 1000
-        results["dns_ok"]  = False
+        results["dns_ms"] = (time.perf_counter() - t0) * 1000
+        results["dns_ok"] = False
         results["dns_err"] = str(e)
         return results
 
@@ -213,10 +232,12 @@ def test_sequential(url: str, n: int, warmup: int) -> tuple[list, list, list]:
 
 
 # ── section 3: concurrent load test ──────────────────────────────────────────
-def test_concurrent(url: str, n_users: int, n_requests: int) -> list[RequestResult]:
-    results   = []
-    lock      = threading.Lock()
-    sessions  = [make_session() for _ in range(n_users)]
+def test_concurrent(
+    url: str, n_users: int, n_requests: int
+) -> tuple[list[RequestResult], float]:
+    results = []
+    lock = threading.Lock()
+    sessions = [make_session() for _ in range(n_users)]
 
     def worker(session_idx: int, req_count: int):
         local = []
@@ -227,7 +248,11 @@ def test_concurrent(url: str, n_users: int, n_requests: int) -> list[RequestResu
             results.extend(local)
 
     requests_per_user = max(1, n_requests // n_users)
-    print(f"  Simulating {n_users} concurrent users × {requests_per_user} req each...", end="", flush=True)
+    print(
+        f"  Simulating {n_users} concurrent users × {requests_per_user} req each...",
+        end="",
+        flush=True,
+    )
 
     t_start = time.perf_counter()
     with ThreadPoolExecutor(max_workers=n_users) as ex:
@@ -242,8 +267,8 @@ def test_concurrent(url: str, n_users: int, n_requests: int) -> list[RequestResu
 
 # ── section 4: sustained throughput ──────────────────────────────────────────
 def test_throughput(url: str, duration_s: int, n_users: int) -> dict:
-    results  = []
-    lock     = threading.Lock()
+    results = []
+    lock = threading.Lock()
     stop_evt = threading.Event()
 
     def worker():
@@ -268,12 +293,12 @@ def test_throughput(url: str, duration_s: int, n_users: int) -> dict:
     successes = [r for r in results if r.success]
     return {
         "total_requests": len(results),
-        "success":        len(successes),
-        "errors":         len(results) - len(successes),
+        "success": len(successes),
+        "errors": len(results) - len(successes),
         "error_rate_pct": (len(results) - len(successes)) / max(1, len(results)) * 100,
-        "rps":            len(results) / elapsed,
-        "totals":         [r.total_ms for r in successes],
-        "elapsed_s":      elapsed,
+        "rps": len(results) / elapsed,
+        "totals": [r.total_ms for r in successes],
+        "elapsed_s": elapsed,
     }
 
 
@@ -284,75 +309,122 @@ def test_local_inference(n: int, warmup: int) -> dict | None:
         import joblib
         import numpy as np
         import pandas as pd
+
         try:
             from src.features import patch_main, engineer_features_a
-            from src.config import (STRESS_MAPPING_A, STRESS_MAPPING_B,
-                                    MODEL_A_BASE_FEATURES, MODEL_B_BASE_FEATURES,
-                                    BURNOUT_SCORE_WEIGHTS)
+            from src.config import (
+                STRESS_MAPPING_A,
+                STRESS_MAPPING_B,
+                MODEL_A_BASE_FEATURES,
+                MODEL_B_BASE_FEATURES,
+                BURNOUT_SCORE_WEIGHTS,
+            )
+
             patch_main()
         except Exception:
-            STRESS_MAPPING_A      = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
-            STRESS_MAPPING_B      = {"Low": 0, "Moderate": 1, "High": 2}
-            MODEL_A_BASE_FEATURES = ["study_hours_per_day","sleep_hours","exam_pressure","stress_level",
-                                     "financial_stress","social_support","anxiety_score","depression_score",
-                                     "family_expectation","physical_activity"]
-            MODEL_B_BASE_FEATURES = ["study_hours","eca_hours","sleep_hours","social_hours","physical_hours","stress_level"]
+            STRESS_MAPPING_A = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
+            STRESS_MAPPING_B = {"Low": 0, "Moderate": 1, "High": 2}
+            MODEL_A_BASE_FEATURES = [
+                "study_hours_per_day",
+                "sleep_hours",
+                "exam_pressure",
+                "stress_level",
+                "financial_stress",
+                "social_support",
+                "anxiety_score",
+                "depression_score",
+                "family_expectation",
+                "physical_activity",
+            ]
+            MODEL_B_BASE_FEATURES = [
+                "study_hours",
+                "eca_hours",
+                "sleep_hours",
+                "social_hours",
+                "physical_hours",
+                "stress_level",
+            ]
             BURNOUT_SCORE_WEIGHTS = [20.0, 55.0, 85.0]
 
             def engineer_features_a(df):
                 df = df.copy()
-                df["stress_x_anxiety"]     = df["stress_level"] * df["anxiety_score"]
-                df["stress_x_depression"]  = df["stress_level"] * df["depression_score"]
-                df["stress_x_exam"]        = df["stress_level"] * df["exam_pressure"]
-                df["anxiety_x_depression"] = df["anxiety_score"] * df["depression_score"]
-                df["study_sleep_ratio"]    = df["study_hours_per_day"] / (df["sleep_hours"] + 1)
+                df["stress_x_anxiety"] = df["stress_level"] * df["anxiety_score"]
+                df["stress_x_depression"] = df["stress_level"] * df["depression_score"]
+                df["stress_x_exam"] = df["stress_level"] * df["exam_pressure"]
+                df["anxiety_x_depression"] = (
+                    df["anxiety_score"] * df["depression_score"]
+                )
+                df["study_sleep_ratio"] = df["study_hours_per_day"] / (
+                    df["sleep_hours"] + 1
+                )
                 df["pressure_support_gap"] = (
-                    (df["exam_pressure"] + df["financial_stress"] + df["family_expectation"]) / 3
+                    (
+                        df["exam_pressure"]
+                        + df["financial_stress"]
+                        + df["family_expectation"]
+                    )
+                    / 3
                 ) - df["social_support"]
-                df["stress_level_sq"]      = df["stress_level"] ** 2
-                df["anxiety_score_sq"]     = df["anxiety_score"] ** 2
-                df["sleep_deprived"]       = (df["sleep_hours"] < 5).astype(int)
-                df["high_stress"]          = (df["stress_level"] > 7).astype(int)
+                df["stress_level_sq"] = df["stress_level"] ** 2
+                df["anxiety_score_sq"] = df["anxiety_score"] ** 2
+                df["sleep_deprived"] = (df["sleep_hours"] < 5).astype(int)
+                df["high_stress"] = (df["stress_level"] > 7).astype(int)
                 return df
 
         print("  Loading models...", end="", flush=True)
-        t0      = time.perf_counter()
-        mA      = joblib.load("models/modelA.pkl")
-        mB      = joblib.load("models/modelB.pkl")
+        t0 = time.perf_counter()
+        mA = joblib.load("models/modelA.pkl")
+        mB = joblib.load("models/modelB.pkl")
         load_ms = (time.perf_counter() - t0) * 1000
         print(f" done ({load_ms:.0f} ms)")
 
-        SAMPLE = dict(zip(MODEL_A_BASE_FEATURES,
-            [6.0, 7.0, 6.0, STRESS_MAPPING_A["Moderate"], 5.0, 5.0, 4.0, 3.0, 6.0, 1.5]))
+        SAMPLE = dict(
+            zip(
+                MODEL_A_BASE_FEATURES,
+                [
+                    6.0,
+                    7.0,
+                    6.0,
+                    STRESS_MAPPING_A["Moderate"],
+                    5.0,
+                    5.0,
+                    4.0,
+                    3.0,
+                    6.0,
+                    1.5,
+                ],
+            )
+        )
 
         def infer_a():
-            df  = pd.DataFrame([SAMPLE], columns=MODEL_A_BASE_FEATURES)
-            t0  = time.perf_counter()
+            df = pd.DataFrame([SAMPLE], columns=MODEL_A_BASE_FEATURES)
+            t0 = time.perf_counter()
             eng = engineer_features_a(df)
-            _   = mA.predict(eng)
+            _ = mA.predict(eng)
             prb = mA.predict_proba(eng)
-            _   = float(np.dot(prb[0], BURNOUT_SCORE_WEIGHTS))
+            _ = float(np.dot(prb[0], BURNOUT_SCORE_WEIGHTS))
             return (time.perf_counter() - t0) * 1000
 
         def infer_b():
             stress = STRESS_MAPPING_B["Moderate"]
             row = dict(zip(MODEL_B_BASE_FEATURES, [6.0, 2.0, 7.0, 3.0, 1.5, stress]))
-            df  = pd.DataFrame([row], columns=MODEL_B_BASE_FEATURES)
-            t0  = time.perf_counter()
-            _   = mB.predict(df)
+            df = pd.DataFrame([row], columns=MODEL_B_BASE_FEATURES)
+            t0 = time.perf_counter()
+            _ = mB.predict(df)
             return (time.perf_counter() - t0) * 1000
 
         for _ in range(warmup):
-            infer_a(); infer_b()
+            infer_a()
+            infer_b()
 
         a_times = [infer_a() for _ in range(n)]
         b_times = [infer_b() for _ in range(n)]
         combined = [a + b for a, b in zip(a_times, b_times)]
 
         return {
-            "load_ms":  load_ms,
-            "a_times":  a_times,
-            "b_times":  b_times,
+            "load_ms": load_ms,
+            "a_times": a_times,
+            "b_times": b_times,
             "combined": combined,
         }
     except Exception as e:
@@ -363,14 +435,31 @@ def test_local_inference(n: int, warmup: int) -> dict | None:
 # ── main ──────────────────────────────────────────────────────────────────────
 def main():
     parser = argparse.ArgumentParser(description="Academic Shield — Performance Test")
-    parser.add_argument("--url",        default="http://localhost:8123", help="App URL")
-    parser.add_argument("--n",          type=int, default=50,  help="Sequential requests (default: 50)")
-    parser.add_argument("--warmup",     type=int, default=3,   help="Warmup requests (default: 3)")
-    parser.add_argument("--users",      type=int, default=10,  help="Concurrent users (default: 10)")
-    parser.add_argument("--duration",   type=int, default=15,  help="Sustained load duration in seconds (default: 15)")
-    parser.add_argument("--infer-n",    type=int, default=100, help="Local inference runs (default: 100)")
-    parser.add_argument("--skip-http",  action="store_true",   help="Skip HTTP tests (inference only)")
-    parser.add_argument("--skip-infer", action="store_true",   help="Skip local inference test")
+    parser.add_argument("--url", default="http://localhost:8123", help="App URL")
+    parser.add_argument(
+        "--n", type=int, default=50, help="Sequential requests (default: 50)"
+    )
+    parser.add_argument(
+        "--warmup", type=int, default=3, help="Warmup requests (default: 3)"
+    )
+    parser.add_argument(
+        "--users", type=int, default=10, help="Concurrent users (default: 10)"
+    )
+    parser.add_argument(
+        "--duration",
+        type=int,
+        default=15,
+        help="Sustained load duration in seconds (default: 15)",
+    )
+    parser.add_argument(
+        "--infer-n", type=int, default=100, help="Local inference runs (default: 100)"
+    )
+    parser.add_argument(
+        "--skip-http", action="store_true", help="Skip HTTP tests (inference only)"
+    )
+    parser.add_argument(
+        "--skip-infer", action="store_true", help="Skip local inference test"
+    )
     args = parser.parse_args()
 
     W = 60
@@ -408,16 +497,22 @@ def main():
         print(f"\n{BOLD}[2] SEQUENTIAL LATENCY ({args.n} requests){RESET}")
         seq_results, ttfbs, totals = test_sequential(args.url, args.n, args.warmup)
 
-        errors     = [r for r in seq_results if not r.success]
+        errors = [r for r in seq_results if not r.success]
         error_rate = len(errors) / len(seq_results) * 100
-        avg_bytes  = statistics.mean([r.content_bytes for r in seq_results if r.success]) if totals else 0
+        avg_bytes = (
+            statistics.mean([r.content_bytes for r in seq_results if r.success])
+            if totals
+            else 0
+        )
 
-        print(f"\n  Requests   : {len(seq_results)}  success={len(seq_results)-len(errors)}  errors={len(errors)}")
+        print(
+            f"\n  Requests   : {len(seq_results)}  success={len(seq_results)-len(errors)}  errors={len(errors)}"
+        )
         print(f"  Error rate : {error_rate:.1f}%")
         print(f"  Avg size   : {avg_bytes/1024:.1f} KB")
         if errors:
             codes = set(r.status_code for r in errors)
-            msgs  = set(r.error for r in errors if r.error)
+            msgs = set(r.error for r in errors if r.error)
             print(f"  Error codes: {codes}")
             if msgs:
                 print(f"  Errors     : {list(msgs)[:3]}")
@@ -431,7 +526,7 @@ def main():
             ts2 = compute_stats(totals)
             print_stats("Total Response Time", ts2)
             verdicts.append(("Response mean", ts2["mean"] <= TARGETS["total_mean"]))
-            verdicts.append(("Response p95",  ts2["p95"]  <= TARGETS["total_p95"]))
+            verdicts.append(("Response p95", ts2["p95"] <= TARGETS["total_p95"]))
 
         verdicts.append(("Error rate", error_rate <= TARGETS["error_rate_pct"]))
 
@@ -441,22 +536,28 @@ def main():
         conc_results, elapsed = test_concurrent(args.url, args.users, args.users * 5)
 
         c_success = [r for r in conc_results if r.success]
-        c_errors  = len(conc_results) - len(c_success)
+        c_errors = len(conc_results) - len(c_success)
         c_err_pct = c_errors / max(1, len(conc_results)) * 100
-        c_totals  = [r.total_ms for r in c_success]
-        c_rps     = len(conc_results) / elapsed
+        c_totals = [r.total_ms for r in c_success]
+        c_rps = len(conc_results) / elapsed
 
         if c_totals:
             cs = compute_stats(c_totals)
             print_stats(f"Concurrent Response Time ({args.users} users)", cs)
             print(f"\n  Throughput : {c_rps:.1f} req/s")
             print(f"  Errors     : {c_errors}/{len(conc_results)}  ({c_err_pct:.1f}%)")
-            verdicts.append(("Concurrent mean", cs["mean"] <= TARGETS["concurrent_mean"]))
-            verdicts.append(("Concurrent errors", c_err_pct <= TARGETS["error_rate_pct"]))
+            verdicts.append(
+                ("Concurrent mean", cs["mean"] <= TARGETS["concurrent_mean"])
+            )
+            verdicts.append(
+                ("Concurrent errors", c_err_pct <= TARGETS["error_rate_pct"])
+            )
 
     # ── 4. Sustained throughput ───────────────────────────────────────────────
     if not args.skip_http:
-        print(f"\n{BOLD}[4] SUSTAINED LOAD ({args.users} users × {args.duration}s){RESET}")
+        print(
+            f"\n{BOLD}[4] SUSTAINED LOAD ({args.users} users × {args.duration}s){RESET}"
+        )
         tput = test_throughput(args.url, args.duration, min(args.users, 5))
 
         print(f"\n  Total requests : {tput['total_requests']}")
@@ -468,7 +569,9 @@ def main():
             ts3 = compute_stats(tput["totals"])
             print_stats("Sustained Response Time", ts3)
 
-        verdicts.append(("Sustained errors", tput["error_rate_pct"] <= TARGETS["error_rate_pct"]))
+        verdicts.append(
+            ("Sustained errors", tput["error_rate_pct"] <= TARGETS["error_rate_pct"])
+        )
         verdicts.append(("Throughput", tput["rps"] >= 0.5))  # at least 0.5 req/s
 
     # ── 5. Local inference ────────────────────────────────────────────────────
@@ -477,14 +580,24 @@ def main():
         inf = test_local_inference(args.infer_n, warmup=5)
         if inf:
             print(f"\n  Model load (cold)   : {inf['load_ms']:.0f} ms")
-            print(f"  Note: cold load happens once per process; subsequent calls are warm")
+            print(
+                f"  Note: cold load happens once per process; subsequent calls are warm"
+            )
 
-            print_stats("Model A  (engineer + predict + predict_proba)", compute_stats(inf["a_times"]))
+            print_stats(
+                "Model A  (engineer + predict + predict_proba)",
+                compute_stats(inf["a_times"]),
+            )
             print_stats("Model B  (predict)", compute_stats(inf["b_times"]))
-            print_stats("Combined A+B  ← actual per-request inference cost", compute_stats(inf["combined"]))
+            print_stats(
+                "Combined A+B  ← actual per-request inference cost",
+                compute_stats(inf["combined"]),
+            )
 
             inf_mean = statistics.mean(inf["combined"])
-            verdicts.append(("Inference < 100ms", inf_mean <= TARGETS["inference_mean"]))
+            verdicts.append(
+                ("Inference < 100ms", inf_mean <= TARGETS["inference_mean"])
+            )
 
     # ── Summary ───────────────────────────────────────────────────────────────
     print(f"\n{'═'*W}")
@@ -492,7 +605,7 @@ def main():
     print(f"{'═'*W}")
 
     passed = sum(1 for _, v in verdicts if v)
-    total  = len(verdicts)
+    total = len(verdicts)
 
     for label, result in verdicts:
         if result:
