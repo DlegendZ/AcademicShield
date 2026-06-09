@@ -1,5 +1,3 @@
-"""Central configuration for Academic Shield app."""
-
 # Stress-level mappings (different encoding per model)
 STRESS_MAPPING_A = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
 STRESS_MAPPING_B = {"Low": 0, "Moderate": 1, "High": 2}
@@ -44,7 +42,7 @@ GPA_LABELS = [
     (0.0, "Needs improvement."),
 ]
 
-# UI - Claude-style warm palette
+# UI - Claude-Inspired style, warm, neutral
 COLORS = {
     "bg": "#FAF6F1",
     "bg_warm": "#F5EDE4",

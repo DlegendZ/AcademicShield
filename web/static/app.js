@@ -23,7 +23,7 @@ const COLORS = {
   accent: "#D97757", text: "#2D2D2D", muted: "#9B9B9B",
   healthy: "#4AA785", mild: "#D4A843", burnout: "#C75050",
 };
-// select_slider rating -> numeric (Page_2.py RATING_TO_SCORE)
+
 const RATING_TO_SCORE = { "Very Low": 0.0, "Low": 2.5, "Moderate": 5.0, "High": 7.5, "Very High": 10.0 };
 const RATING_OPTIONS = ["Very Low", "Low", "Moderate", "High", "Very High"];
 // Model B clamp ranges: key -> [lo, hi, trainingMean]
@@ -33,7 +33,6 @@ const B_RANGES = {
   physical_hours: [0.0, 13.0, 4.33],
 };
 
-// Inference - ports of src/models.py predict_burnout / predict_gpa
 function predictBurnout(inp) {
   const stress = STRESS_MAPPING_A[inp.stress_level_category];
   const f = {
@@ -43,7 +42,7 @@ function predictBurnout(inp) {
     anxiety_score: inp.anxiety_score, depression_score: inp.depression_score,
     family_expectation: inp.family_expectation, physical_activity: inp.physical_hours,
   };
-  // engineer_features_a (src/features.py) — order MUST match training
+  // engineer_features_a (src/features.py) - order MUST match training
   const vec = [
     f.study_hours_per_day, f.sleep_hours, f.exam_pressure, f.stress_level,
     f.financial_stress, f.social_support, f.anxiety_score, f.depression_score,
