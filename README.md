@@ -137,9 +137,7 @@ Open **http://localhost:8123** in your browser.
 
 The app is deployed on Vercel. Access it at:
 
-**[https://academic-shield.vercel.app](https://academic-shield.vercel.app)**
-
-> If the link above is outdated, check the latest deployment URL in the Vercel dashboard for this project.
+**[https://academic-shield-eta.vercel.app](https://academic-shield-eta.vercel.app)**
 
 Static assets (HTML, JS, models) are served from Vercel's CDN edge. Only `/api/feedback` hits the FastAPI serverless function (may cold-start after idle — does not affect prediction).
 
@@ -166,7 +164,7 @@ python performance_test.py --url http://localhost:8123
 **Test deployed app:**
 
 ```bash
-python performance_test.py --url https://academic-shield.vercel.app
+python performance_test.py --url https://academic-shield-eta.vercel.app
 ```
 
 **Heavy load test:**
