@@ -15,7 +15,7 @@ Usage:
     python performance_test.py --url https://yourapp.vercel.app
 
     # Test local app
-    python performance_test.py --url http://localhost:8123
+    python performance_test.py --url http://127.0.0.1:8123
 
     # Heavy load test
     python performance_test.py --url https://yourapp.vercel.app --n 200 --users 20
