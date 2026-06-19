@@ -110,6 +110,10 @@ body {
   text-align: center;
   margin-bottom: 22px;
 }
+.logo-shield {
+  display: block;
+  margin: 0 auto 14px;
+}
 .hero h1 {
   font-size: 1.85rem;
   font-weight: 600;
@@ -122,13 +126,32 @@ body {
   line-height: 1.5;
   margin: 0;
 }
+.eyebrow {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 22px;
+}
+.tagline {
+  color: var(--text-2);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  margin: 0;
+}
 
 .progress {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.progress-dots {
+  display: flex;
   align-items: center;
   gap: 8px;
-  justify-content: center;
-  margin-bottom: 14px;
 }
 .progress .dot {
   width: 10px;
@@ -149,15 +172,12 @@ body {
   background: var(--accent);
 }
 .progress em {
-  width: 100%;
-  flex-basis: 100%;
   text-align: center;
   font-style: normal;
   color: var(--muted);
   font-size: 0.78rem;
   letter-spacing: 1.5px;
   text-transform: uppercase;
-  margin-top: 4px;
 }
 
 .card {
@@ -328,7 +348,7 @@ textarea {
   border: 1px solid var(--accent-border);
   border-radius: 12px;
   padding: 10px;
-  margin-bottom: 16px;
+  margin: 10px 0 0;
 }
 .latency {
   text-align: center;

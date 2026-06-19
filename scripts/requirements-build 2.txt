@@ -1,0 +1,3 @@
+# For transpiling purposes only
+m2cgen==0.10.0
+imbalanced-learn==0.14.1
