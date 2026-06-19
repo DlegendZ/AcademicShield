@@ -1,0 +1,22 @@
+artifact_path: file:///c:/Users/asus/Downloads/AcademicShield/mlruns/1/models/m-e9f30e516cdd416696951072d1d376a4/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.10.19
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBRegressor
+    model_format: ubj
+    xgb_version: 3.2.0
+mlflow_version: 3.12.0
+model_id: m-e9f30e516cdd416696951072d1d376a4
+model_size_bytes: 464302
+model_uuid: m-e9f30e516cdd416696951072d1d376a4
+prompts: null
+run_id: d8d3ee2dc2e54afda174a8662980efa3
+utc_time_created: '2026-06-09 15:39:13.420386'
