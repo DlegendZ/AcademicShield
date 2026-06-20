@@ -1,4 +1,5 @@
 # Stress-level mappings (different encoding per model)
+# NOTE (Model A): manually-set representative values for the Low/Moderate/High UI categories, since stress_level is a continuous 0-10 feature in the raw data
 STRESS_MAPPING_A = {"Low": 2.29, "Moderate": 4.80, "High": 7.42}
 STRESS_MAPPING_B = {"Low": 0, "Moderate": 1, "High": 2}
 
