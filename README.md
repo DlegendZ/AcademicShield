@@ -91,7 +91,7 @@ Used to train **Model A** (burnout classifier).
 
 Used to train **Model B** (GPA predictor).
 
-- **Source:** [Kaggle — Student Stress Performance Insights](https://www.kaggle.com/code/sulaniishara/student-stress-performance-insights)
+- **Source:** [Kaggle — Student Stress Performance Insights](https://www.kaggle.com/datasets/steve1215rogg/student-lifestyle-dataset)
 - **File:** `datasets/student_lifestyle_dataset.csv`
 - **Size:** ~2,000 rows
 - **Key features:** study hours, extracurricular hours, sleep hours, social hours, physical hours, stress level
