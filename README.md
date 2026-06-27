@@ -28,8 +28,8 @@ Prediction runs **100% client-side in the browser** (< 1 ms, no server round-tri
 | **Task** | 3-class classification (Healthy / Mildly Burnout / Burnout) | Regression (GPA 0–4) |
 | **Algorithm** | XGBClassifier | XGBRegressor |
 | **Dataset** | `datasets/academic_stress_level.csv` (1 M rows) | `datasets/student_lifestyle_dataset.csv` (2 k rows) |
-| **Accuracy / R²** | Acc 0.8465 · Macro-F1 0.5279 · CV Acc 0.8464 ± 0.0006 | R² 0.5357 · MAE 0.1637 · CV R² 0.5279 ± 0.0249 |
-| **Deployed size** | 1.6 MB | 0.5 MB |
+| **Accuracy / R²** | Acc 0.8465 · Macro-F1 0.5279 · CV Acc 0.8464 ± 0.0006 | R² 0.5357 · MAE 0.1637 · RMSE 0.2024 · CV R² 0.5279 ± 0.0249 |
+| **Deployed size** | 2.4 MB | 0.3 MB |
 
 **Research vs. deployed models.** Full Optuna-tuned research models live in `notebooks/experiment/` (Model A ≈ 210 MB / 11.4 M nodes — too large for client-side). Compact retrains in `notebooks/modelA.ipynb` / `notebooks/modelB.ipynb` are the **single source of truth** for the app. Performance is on par with the research versions.
 
