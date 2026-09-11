@@ -8,6 +8,7 @@ Prediction runs **100% client-side in the browser** (< 1 ms, no server round-tri
 
 ## Table of Contents
 
+- [Screenshots](#screenshots)
 - [Models](#models)
 - [Architecture](#architecture)
 - [Repository Layout](#repository-layout)
@@ -18,6 +19,20 @@ Prediction runs **100% client-side in the browser** (< 1 ms, no server round-tri
 - [Performance Testing](#performance-testing)
 - [Rebuilding Models](#rebuilding-models)
 - [Deployment (Vercel)](#deployment-vercel)
+
+---
+
+## Screenshots
+
+| Step 1 — Lifestyle & Habits | Step 2 — Mental Health & Stress |
+|---|---|
+| ![Step 1: lifestyle and habits input](docs/screenshots/01-lifestyle-input.png) | ![Step 2: mental health and stress input](docs/screenshots/02-mental-health-input.png) |
+
+<p align="center">
+  <img src="docs/screenshots/03-results.png" alt="Results: burnout gauge, predicted GPA, profile radar, classification breakdown and feedback form" width="640">
+  <br>
+  <em>Results — burnout level, predicted GPA, profile radar, class probabilities, and feedback form</em>
+</p>
 
 ---
 
